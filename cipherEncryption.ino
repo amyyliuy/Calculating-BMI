@@ -53,7 +53,7 @@ void loop(){
      x = 1;
     }
     else {
-     w0rd[i] = rcvString.toChar();
+     w0rd[] = rcvString.toChar();
      Serial.println(w0rd);
      x = 0;
     }
