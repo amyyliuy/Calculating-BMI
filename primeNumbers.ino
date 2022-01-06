@@ -4,27 +4,25 @@ Generate the 1st 30 prime number in the number system.
 What's the 26th Prime number in your series? Does your answer match up with everyone else?
 */
 
-int i = 0;
+int i = 1;
 int j = 0;
-boolean prime;
+int count = 1;
 
 void setup() {
   Serial.begin(115200);
-  delay(1000)
-  Serial.println("Here are the first 30 prime numbers in the number system: ")
-
-  for (i = 2; i <=30; i++) {
-    for (j = 3; j <= 30; j+=2) {
-      if (i % j == 0) {
-        prime = false;
-        break;
-      }
-    }
-  } else {
-      prime = true;
-      Serial.println(prime);
-
+  delay(1500);
   
+while (count <= 30) {
+  for (j = 2; j < i; j++) {
+    if (i % j == 0)
+           break;
+  }
+  if (j == i) { 
+    Serial.println(i);
+    count++;
+  }
+  i++;
+ }
 }
 
 void loop() {
