@@ -1,8 +1,4 @@
-/* I am pretty sure you have heard of encryption before. 
-An early form of encryption named after Julius Caesar is the Caesar cipher. 
-It is one of the simplest and most widely known encryption techniques.
-
-To encrypt a line of text, each letter in the plaintext is replaced by a letter with some fixed number 
+/* To encrypt a line of text, each letter in the plaintext is replaced by a letter with some fixed number 
 (communicated beforehand) of positions down the alphabet list.
 
 Implement a software that could encrypt & decrypt a message with the CoreModule. 
