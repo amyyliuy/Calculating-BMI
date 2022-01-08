@@ -23,7 +23,7 @@ void loop() {
       height = rcvString.toFloat();
       Serial.print(height);
       i = 0;
-     
+     }
       BMI = (weight/(pow(height, 2.0)));
         if (BMI < 16) {
             Serial.println("\nYou are severly underweight.");
