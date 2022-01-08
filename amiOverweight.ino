@@ -22,7 +22,6 @@ void loop() {
      else {
       height = rcvString.toFloat();
       Serial.print(height);
-      Serial.println("\nPlease enter your age: ");
       i = 0;
      
       BMI = (weight/(pow(height, 2.0)));
