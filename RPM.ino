@@ -1,4 +1,5 @@
                     
+                    
 /*
   Robotic MainBoard Co-processing Communication
 
@@ -170,6 +171,23 @@ int setDirection(int motor, byte direction) {
     }
 }
 
+int setRPM(int motor, float RPM){
+    attinySlaveArrayBoard[0] = motor == 0 ? 0x14 : 0x24;  // Command 0x14 or 0x24
+    attinySlaveArrayBoard[1] = 0x00;  // Param1 - Low
+    attinySlaveArrayBoard[2] = RPM;  // Param2 - High
+    delay(10);
+    Wire.beginTransmission(I2CADDR_B);
+    Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to Co-processor.
+    if (Wire.endTransmission () == 0) { // Receive 0 = success (ACK response) 
+        Serial.println("i2c Write to 0x12 Sucessfull");
+        return 0;
+    }
+    else {
+        Serial.println("i2c Write Failed");
+        return 1;
+    }
+}
+
 // the setup function runs once when you press reset or power the board
 void setup() {
 
@@ -187,7 +205,7 @@ void setup() {
     
     oled.setFont(Adafruit5x7);
     oled.clear();
-    oled.println("MainBoard Co-Processor");
+    oled.println("MainBoard Co-Processor"); 
     oled.println("IPC (Interprocess Comm)");
 
 }
@@ -206,51 +224,20 @@ void loop() {
     delay(1000);
 
     oled.clear();
-    oled.println("-Motor Start FW (5s)-");
+    oled.println("-Motor Start FWs (5s)-");
     setDirection(0, CCW);
     setDirection(1, CW);
+    setRPM(0, 6);
+    setRPM(1, 6);
     setMotorRunning(HIGH);
+
+
     delay(5000);
 
     oled.clear();
     oled.println("-Motor Stop (3s)-");
     setMotorRunning(LOW);
     delay(3000);
-
-    oled.clear();
-    oled.println("-Motor Start CCW- (5s)");
-    setDirection(0, CCW);
-    setDirection(1, CCW);
-    setMotorRunning(HIGH);
-    delay(5000);
-
-    oled.clear();
-    oled.println("-Motor Stop (1s)-");
-    setMotorRunning(LOW);
-    delay(1000);
-    oled.clear();
-
-    oled.println("-Motor Start CW- (5s)");
-    setDirection(0, CW);
-    setDirection(1, CW);
-    setMotorRunning(HIGH);
-    delay(5000);
-
-    oled.clear();
-    oled.println("-Motor Stop (1s)-");
-    setMotorRunning(LOW);
-    delay(1000);
-
-    oled.println("-Motor Start REW- (5s)");
-    setDirection(0, CW);
-    setDirection(1, CCW);
-    setMotorRunning(HIGH);
-    delay(5000);
-
-    oled.clear();
-    oled.println("-Motor Stop (1s)-");
-    setMotorRunning(LOW);
-    delay(1000);
+    
 }
-                    
-                
+                   
