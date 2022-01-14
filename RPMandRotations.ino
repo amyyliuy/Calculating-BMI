@@ -133,7 +133,7 @@ int rotateMotor (int motor,unsigned int rotations) {
   attinySlaveArrayBoard[0] = motor == 0 ? 0x11 : 0x21; 
   attinySlaveArrayBoard[1] = lowByte(rotations);  
   attinySlaveArrayBoard[2] = highByte(rotations);  
-   delay(10);
+  delay(10);
   Wire.beginTransmission(I2CADDR_B);
   Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to Co-processor.
   if (Wire.endTransmission () == 0) { // Receive 0 = success (ACK response) 
