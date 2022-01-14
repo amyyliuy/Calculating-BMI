@@ -1,62 +1,3 @@
-                    
-                    
-/*
-  Robotic MainBoard Co-processing Communication
-
-  ESP32-C3 control LED blinking & Basic Stepper motor movement
-  
-  LEDs
-  --  IO2
-  --  PA7 (3)(ATTINY1614)
-
-  I2C
-  --  IO18 (SCL) <-> PB0 (ATTINY1614)
-  --  IO19 (SDA) <-> PB1 (ATTINY1614)
-
-
-  I2C commands
-  -- all i2c write commands have 2 bytes parameter (little endian)
-   
-   MotorA -> Left Motor
-   MotorB -> Right Motor
-   Write:
-   |   commands         | param1   | param2   |  description                                            |
-   |--------------------|----------|----------|---------------------------------------------------------|
-   | 0x00 | ParamInit   | dummy    | dummy    | Set motor profile to default value                      |
-   | 0x01 | Stop/Run    | Stop/Run | dummy    | Stop/Run both stepper motors.                           |
-   |      | Both Motors |          |          |                                                         |
-   | 0x02 | Enable      | 0/1      | dummy    | PA7 (3) LED.                                            |
-   |      |             |          |          |                                                         |   
-   |      |             |          |          |     Motor A                                             |   
-   | 0x11 | Rotate(Rev) | rev(L)   | rev(H)   | Move number of revolution                               |
-   |      |             |          |          |  if number is 0x0000 move infinity steps (continuous)   |
-   | 0x12 | Stop        | dummy    | dummy    | Stop Motor (Same as sending Stop(0) to Direction        |
-   | 0x13 | Direction   | Stop/Dir | dummy    | Accept the following: STOP->0 CW->1 CCW->2              |
-   | 0x14 | RPM (x100)  | rpm(L)   | rpm(H)   | Set the Round per minutes x 100 of the Motor            |
-   | 0x15 | SPR         | spr(L)   | spr(H)   | Set Steps Per Rotation of the motor of the motor        |
-   |      |             |          |          |     default is 0 -> 4075.7728395                        | 
-   | 0x16 | Rotate(Deg) | deg(L)   | deg(H)   | Rotate the motor a given number of degrees (x10)        |
-   |      | (x10)       |          |          |                                                         |   
-   |      |             |          |          |                                                         |   
-   |      |             |          |          |     Motor - B                                           |
-   | 0x21 | Rotate(Rev) | rev(L)   | rev(H)   | Move number of revolution                               |
-   |      |             |          |          |  if number is 0x0000 move infinity steps (continuous)   |
-   | 0x22 | Stop        | dummy    | dummy    | Stop Motor (Same as sending Stop(0) to Direction        |
-   | 0x23 | Direction   | Stop/Dir | dummy    | Accept the following: STOP->0 CW->1 CCW->2              |
-   | 0x24 | RPM (x100)  | rpm(L)   | rpm(H)   | Set the Round per minutes x 100 of the Motor            |
-   | 0x25 | SPR         | spr(L)   | spr(H)   | Set Steps Per Rotation of the motor of the motor        |
-   |      |             |          |          |     default is 0 -> 4075.7728395                        | 
-   | 0x26 | Rotate(Deg) | deg(L)   | deg(H)   | Rotate the motor a given number of degrees (x10)        |
-   |      | (x10)       |          |          |                                                         |   
-    
-   Read:
-   |                       param1                    |  description                                     |
-   |-------------------------------------------------|--------------------------------------------------|
-   | (version# << 4) or (motorA << 1) or (motorB)    | Retrieve the state of the motors                 |
-  
-*/
-
-
 #include <Wire.h>
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"
@@ -186,6 +127,23 @@ int setRPM(int motor, float RPM){
         Serial.println("i2c Write Failed");
         return 1;
     }
+}
+
+int rotateMotor (int motor,unsigned int rotations) {
+  attinySlaveArrayBoard[0] = motor == 0 ? 0x11 : 0x21; 
+  attinySlaveArrayBoard[1] = lowByte(rotations);  
+  attinySlaveArrayBoard[2] = highByte(rotations);  
+   delay(10);
+  Wire.beginTransmission(I2CADDR_B);
+  Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to Co-processor.
+  if (Wire.endTransmission () == 0) { // Receive 0 = success (ACK response) 
+      Serial.println("i2c Write to 0x12 Sucessfull");
+      return 0;
+  }
+  else {
+      Serial.println("i2c Write Failed");
+      return 1;
+  }
 }
 
 // the setup function runs once when you press reset or power the board
