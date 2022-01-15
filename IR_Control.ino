@@ -34,6 +34,19 @@
 #define LED 2
 #define IR_RECV 4
 
+#define SR04_I2CADDR 0x57
+#define OLED_I2CAADR 0x3C
+
+// i2c PCF8574(A) Port expander
+// PCF8574  -> 0 0 1 0  0 A2 A1 A0    0 0 1 1
+// PCF8574A -> 0 0 1 1  1 A2 A1 A0    1 0 1 1
+#define PEXP_I2CADDR 0x23
+
+// i2c Slave Co-processor - On the Core-Module
+#define I2CADDR 0x13
+// i2c Slave Co-processor - On the Robot MainBoard
+#define I2CADDR_B 0x12
+
 SSD1306AsciiWire oled;
 
 uint8_t LEDState = LOW;
@@ -56,6 +69,23 @@ int setMotorRunning(uint8_t motorState) {
     attinySlaveArrayBoard[0] = 0x01;  // Command 0x01
     attinySlaveArrayBoard[1] = motorState? 0x01:0x00;  // Param1 - Stop/Run
     attinySlaveArrayBoard[2] = 0x00;  // Param2 - Dummy in this case
+    delay(10);
+    Wire.beginTransmission(I2CADDR_B);
+    Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to Co-processor.
+    if (Wire.endTransmission () == 0) { // Receive 0 = success (ACK response) 
+        Serial.println("i2c Write to 0x12 Sucessfull");
+        return 0;
+    }
+    else {
+        Serial.println("i2c Write Failed");
+        return 1;
+    }
+}
+
+int setRPM(int motor, float RPM){
+    attinySlaveArrayBoard[0] = motor == 0 ? 0x14 : 0x24;  // Command 0x14 or 0x24
+    attinySlaveArrayBoard[1] = 0x00;  // Param1 - Low
+    attinySlaveArrayBoard[2] = RPM;  // Param2 - High
     delay(10);
     Wire.beginTransmission(I2CADDR_B);
     Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to Co-processor.
@@ -188,23 +218,23 @@ void loop() {
         oled.println(text);                             // Display command in hex format
 
 
-        oled.println("--------")
+        oled.println("--------");
 
         if (command == 0x18) {
-          oled.println("Moving forwards...")
-          setDirection(0, CCW)
-          setDirection(0, CW)
-          setMotorRunning(HIGH)
+          oled.println("Moving forwards...");
+          setDirection(0, CCW);
+          setDirection(1, CW);
+          setMotorRunning(HIGH);
         }
         else if (command == 0x4A) {
-          oled.println("Moving backwards...")
-          setDirection(0, CW)
-          setDirection(0, CCW)
-          setMotorRunning(HIGH)
+          oled.println("Moving backwards...");
+          setDirection(0, CW);
+          setDirection(1, CCW);
+          setMotorRunning(HIGH);
         }
         else if (command == 0x38) {
-          oled.println("Stop.")
-          setMotorRunning(LOW)
+          oled.println("Stop.");
+          setMotorRunning(LOW);
         }
 
 
@@ -212,4 +242,4 @@ void loop() {
     }   
 }
                     
-                
+                        
