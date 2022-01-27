@@ -52,16 +52,12 @@ uint8_t IOexpanderRead(int address) {
 
 int setBoardLED(uint8_t outputState) {
     attinySlaveArrayBoard[0] = 0x02;  // Command 0x02
-    attinySlaveArrayBoard[1] = outputState? 0x01:0x00;  // Param1 -
-LED State
+    attinySlaveArrayBoard[1] = outputState? 0x01:0x00;  // Param1 - LED State
     attinySlaveArrayBoard[2] = 0x00;  // Param2 - Dummy in this case
     delay(10);
     Wire.beginTransmission(I2CADDR_B);
-    Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to
-Co-processor.
-    if (Wire.endTransmission () == 0) { // Receive 0 = success (ACK
-
-response)
+    Wire.write(attinySlaveArrayBoard, 3); // Sends 3 bytes i2c to Co-processor.
+    if (Wire.endTransmission () == 0) { // Receive 0 = success (ACK response)
         Serial.println("i2c Write to 0x12 Sucessfull");
         return 0;
 }
@@ -80,8 +76,7 @@ return 1; }
 
 int setMotorRunning(uint8_t motorState) {
     attinySlaveArrayBoard[0] = 0x01;  // Command 0x01
-    attinySlaveArrayBoard[1] = motorState? 0x01:0x00;  // Param1 -
-Stop/Run
+    attinySlaveArrayBoard[1] = motorState? 0x01:0x00;  // Param1 - Stop/Run
     attinySlaveArrayBoard[2] = 0x00;  // Param2 - Dummy in this case
     delay(10);
     Wire.beginTransmission(I2CADDR_B);
@@ -194,7 +189,8 @@ void readSensorValues()
             error = pidErrorMap[i][5];
         }
         if (sensor[0] + sensor[1] + sensor[2] + sensor[3] + sensor[4] == 5) {
-// No Line?? }
+// No Line?? 
+        }
         else if (sensor[0] + sensor[1] + sensor[2] + sensor[3] + sensor[4] == 0) {
             // Full Line??
         }
@@ -228,8 +224,7 @@ void motorControl()
     float leftMotorSpeed = maxSpeed - PID_value;
     float rightMotorSpeed = maxSpeed + PID_value;
     leftMotorSpeed = constrain(leftMotorSpeed, minSpeed, maxSpeed);
-    rightMotorSpeed = constrain(rightMotorSpeed, minSpeed,
-maxSpeed);
+    rightMotorSpeed = constrain(rightMotorSpeed, minSpeed, maxSpeed);
     setMotorSpeed(leftMotorSpeed, rightMotorSpeed);
 }
 
