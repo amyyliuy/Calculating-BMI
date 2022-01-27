@@ -236,7 +236,18 @@ void loop() {
           oled.println("Stop.");
           setMotorRunning(LOW);
         }
-
+        else if(command == 0x10){
+          oled.println("Turn Left");
+          setDirection(0, CCW);
+          setDirection(1, CCW);
+          setMotorRunning(HIGH);
+        }
+        else if(command == 0x5A){
+          oled.println("Turn Right");
+          setDirection(1, CW);
+          setDirection(0, CW);
+          setMotorRunning(HIGH);
+        }
 
 //      attachInterrupt(digitalPinToInterrupt(IR_RECV), irISR, FALLING);  //Setting IR again on FALLING edge.
     }   
