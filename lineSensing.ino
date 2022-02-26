@@ -243,4 +243,36 @@ void loop() {
     readSensorValues();
     calculatePID();
     motorControl();
+    
+    if (millis() - lastColSensorRead >= 1000) {
+      uint16_t r, g, b, c, colorTemp, lux;
+      float red, green, blue;
+      char colorBuff[20]; //We just need 12... but let's add more just in case
+      tcs.getRawData(&r, &g, &b, &c);
+    
+      oled.setCursor(0, 3); 
+      oled.print("R: "); oled.print(r, DEC); oled.print("red");
+      oled.print("G: "); oled.print(g, DEC); oled.println("green");
+      oled.print("B: "); oled.print(b, DEC); oled.print("blue");
+      oled.print("C: "); oled.print(c, DEC); oled.println("   ");
+      tcs.getRGB(&red, &green, &blue);
+
+      Serial.print("R:\t"); Serial.print(int(red)); 
+      Serial.print("\tG:\t"); Serial.print(int(green)); 
+      Serial.print("\tB:\t"); Serial.println(int(blue));
+  
+      sprintf(colorBuff, "Color=%02X%02X%02X", (int)red,(int)green,(int)blue);
+      oled.print(colorBuff); oled.println("   ");
+      webSocket.broadcastTXT(colorBuff);
+      lastColSensorRead = millis();
+      
+      if (green > 135){
+      setMotorRunning(LOW); 
+      delay(10000);
+      setMotorRunning(HIGH); 
+  }
+    }
+  
+  delay(2);//allow the cpu to switch to other tasks
+  
 }
